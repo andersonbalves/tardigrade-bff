@@ -1,42 +1,19 @@
 import { Injectable } from '@nestjs/common';
-import fs from 'fs';
 
-import path from 'path';
-
-import { FormService } from '../../form.service.interface';
+import { FormService } from '../../form.abstract.service';
 import { FormModel } from '../../model/form.model';
 import { form } from './form';
 
 @Injectable()
-export class PrimeiroNivelTresFormService implements FormService {
-  private _id = 'v1/form/primeiro_nivel_3';
-  private _label = 'Primeiro Nível - 3';
-  private _menuPath = [];
-  private _url = 'https://api.example.com/data';
-  private _filePath = 'payload.json';
+export class PrimeiroNivelTresFormService extends FormService {
+  protected _id = 'v1/form/primeiro_nivel_3';
+  protected _label = 'Primeiro Nível - 3';
+  protected _menuPath = [];
+  protected _url = 'https://api.example.com/data';
+  protected _filePath = 'payload.json';
+  protected _dirname = __dirname;
 
-  async getForm(): Promise<FormModel | undefined> {
+  async getForm(): Promise<FormModel> {
     return form;
-  }
-
-  getAPI(): any {
-    return {
-      url: this._url,
-      payload: JSON.parse(
-        fs.readFileSync(path.join(__dirname, this._filePath), 'utf8'),
-      ),
-    };
-  }
-
-  get id(): string {
-    return this._id;
-  }
-
-  get label(): string {
-    return this._label;
-  }
-
-  get menuPath(): string[] {
-    return this._menuPath;
   }
 }

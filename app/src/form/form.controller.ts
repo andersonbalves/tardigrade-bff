@@ -21,7 +21,7 @@ export class FormController {
 
   @Post('*')
   async sendRequest(@Req() req: Request, @Res() res: Response) {
-    const requestedApi = req.url.replace('/v1/form/', '');
+    const requestedApi = req.url.replace('/', '');
     try {
       const form = await this.formRegistryService.sendRequest({
         requestedApi,

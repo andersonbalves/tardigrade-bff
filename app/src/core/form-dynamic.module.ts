@@ -1,7 +1,7 @@
 import { DynamicModule, Module, Type } from '@nestjs/common';
 import { readdirSync, statSync } from 'fs';
 import { join } from 'path';
-import { FORM_SERVICE_TOKEN } from './form.service.interface';
+import { FORM_SERVICE_TOKEN } from './form.abstract.service';
 
 interface ImplementationModule {
   module: Type<any>;

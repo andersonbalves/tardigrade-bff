@@ -1,8 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
-import {
-  FORM_SERVICE_TOKEN,
-  FormService,
-} from '../core/form.service.interface';
+import * as mustache from 'mustache';
+import { FORM_SERVICE_TOKEN, FormService } from '../core/form.abstract.service';
 import { FormModel } from '../core/model/form.model';
 
 @Injectable()
@@ -25,6 +23,11 @@ export class FormRegistryService {
     const service = this.formServices.find(
       (service) => service.id === data.requestedApi,
     );
-    return service ? service.getAPI() : undefined;
+    const payload = mustache.render(
+      JSON.stringify((await service?.getAPI())?.payload),
+      data.payload,
+    );
+
+    return JSON.parse(payload);
   }
 }

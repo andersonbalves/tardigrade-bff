@@ -1,8 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common';
-import {
-  FORM_SERVICE_TOKEN,
-  FormService,
-} from '../core/form.service.interface';
+import { FORM_SERVICE_TOKEN, FormService } from '../core/form.abstract.service';
 import { MenuModel } from '../core/model/menu.model';
 
 @Injectable()
