@@ -1,62 +1,63 @@
-import { Injectable } from '@nestjs/common';
-import { EventEmitter2 } from '@nestjs/event-emitter';
-import { MenuModel } from './model/menu.model';
+import { Inject, Injectable } from '@nestjs/common';
+import {
+  FORM_SERVICE_TOKEN,
+  FormService,
+} from '../core/form.service.interface';
+import { MenuModel } from '../core/model/menu.model';
+
 @Injectable()
 export class MenuService {
-  constructor(private eventEmitter: EventEmitter2) {}
+  constructor(
+    @Inject(FORM_SERVICE_TOKEN) private readonly formServices: FormService[],
+  ) {}
+
   createMenu = async (): Promise<MenuModel[]> => {
-    return [
-      {
-        label: 'Primeiro Nível - 1',
-        action: [
+    const addMenuItem = (
+      path: string[],
+      formService: FormService,
+      menuItems: MenuModel[],
+    ): MenuModel[] => {
+      if (path.length === 0) {
+        return [
+          ...menuItems,
           {
-            label: 'Segundo Nível - A',
-            action: [
-              {
-                label: 'Terceiro Nível - 1',
-                action:
-                  'v1/form/primeiro_nivel_1/segundo_nivel_a/terceiro_nivel_1',
-              },
-              {
-                label: 'Terceiro Nível - 2',
-                action:
-                  'v1/form/primeiro_nivel_1/segundo_nivel_a/terceiro_nivel_2',
-              },
-            ],
+            label: formService.label,
+            action: formService.id,
           },
-          {
-            label: 'Segundo Nível - B',
-            action: 'v1/form/primeiro_nivel_1/segundo_nivel_b',
-          },
-          {
-            label: 'Segundo Nível - C',
-            action: [
-              {
-                label: 'Terceiro Nível - XPTO',
-                action:
-                  'v1/form/primeiro_nivel_1/segundo_nivel_c/terceiro_nivel_xpto',
-              },
-            ],
-          },
-        ],
-      },
-      {
-        label: 'Primeiro Nível - 2',
-        action: [
-          {
-            label: 'Segundo Nível - X',
-            action: 'v1/form/primeiro_nivel_2/segundo_nivel_x',
-          },
-          {
-            label: 'Segundo Nível - Z',
-            action: 'v1/form/primeiro_nivel_2/segundo_nivel_z',
-          },
-        ],
-      },
-      {
-        label: 'Primeiro Nível - 3',
-        action: 'v1/form/primeiro_nivel_3',
-      },
-    ];
+        ];
+      }
+
+      const [currentPath, ...remainingPath] = path;
+      const existingMenuItem = menuItems.find(
+        (item) => item.label === currentPath,
+      );
+
+      if (existingMenuItem) {
+        return menuItems.map((item) =>
+          item.label === currentPath
+            ? {
+                ...item,
+                action: Array.isArray(item.action)
+                  ? addMenuItem(remainingPath, formService, item.action)
+                  : [],
+              }
+            : item,
+        );
+      }
+
+      return [
+        ...menuItems,
+        {
+          label: currentPath,
+          action: addMenuItem(remainingPath, formService, []),
+        },
+      ];
+    };
+
+    return this.formServices.reduce(
+      (menuItems, formService) =>
+        addMenuItem(formService.menuPath, formService, menuItems),
+      [] as MenuModel[],
+    );
   };
 }

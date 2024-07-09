@@ -1,21 +1,37 @@
-import { Controller, Get, HttpStatus, Req, Res } from '@nestjs/common';
+import { Controller, Get, HttpStatus, Post, Req, Res } from '@nestjs/common';
 import { Request, Response } from 'express';
-import { FormService } from './form.service';
+import { FormRegistryService } from './form-registry.service';
 
 @Controller('v1/form')
 export class FormController {
-  constructor(private apisService: FormService) {}
+  constructor(private formRegistryService: FormRegistryService) {}
 
   @Get('*')
   async findAPIFields(@Req() req: Request, @Res() res: Response) {
+    const requestedApi = req.url.replace('/', '');
+    try {
+      const form = await this.formRegistryService.getFields(requestedApi);
+      return form
+        ? res.status(HttpStatus.OK).send(form)
+        : res.sendStatus(HttpStatus.NOT_FOUND);
+    } catch {
+      return res.sendStatus(HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  @Post('*')
+  async sendRequest(@Req() req: Request, @Res() res: Response) {
     const requestedApi = req.url.replace('/v1/form/', '');
-    return this.apisService
-      .getFields(requestedApi)
-      .then((form) =>
-        form
-          ? res.status(HttpStatus.OK).send(form)
-          : res.sendStatus(HttpStatus.NOT_FOUND),
-      )
-      .catch(() => res.sendStatus(HttpStatus.INTERNAL_SERVER_ERROR));
+    try {
+      const form = await this.formRegistryService.sendRequest({
+        requestedApi,
+        payload: req.body,
+      });
+      return form
+        ? res.status(HttpStatus.OK).send(form)
+        : res.sendStatus(HttpStatus.NOT_FOUND);
+    } catch {
+      return res.sendStatus(HttpStatus.INTERNAL_SERVER_ERROR);
+    }
   }
 }
