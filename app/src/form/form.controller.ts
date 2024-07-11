@@ -1,37 +1,45 @@
-import { Controller, Get, HttpStatus, Post, Req, Res } from '@nestjs/common';
-import { Request, Response } from 'express';
+import {
+  Body,
+  Controller,
+  Get,
+  HttpException,
+  HttpStatus,
+  Param,
+  Post,
+  UseFilters,
+} from '@nestjs/common';
+import { InternalErrorFilter } from '../handlers/internal-error.filter';
 import { FormRegistryService } from './form-registry.service';
 
 @Controller('v1/form')
+@UseFilters(new InternalErrorFilter())
 export class FormController {
   constructor(private formRegistryService: FormRegistryService) {}
 
-  @Get('*')
-  async findAPIFields(@Req() req: Request, @Res() res: Response) {
-    const requestedApi = req.url.replace('/', '');
-    try {
-      const form = await this.formRegistryService.getFields(requestedApi);
-      return form
-        ? res.status(HttpStatus.OK).send(form)
-        : res.sendStatus(HttpStatus.NOT_FOUND);
-    } catch {
-      return res.sendStatus(HttpStatus.INTERNAL_SERVER_ERROR);
-    }
+  @Get(':id')
+  async findAPIFields(@Param('id') id: string) {
+    return this.formRegistryService
+      .getFields(id)
+      .then((form) =>
+        form
+          ? form
+          : Promise.reject(
+              new HttpException('Form not found', HttpStatus.NOT_FOUND),
+            ),
+      );
   }
 
-  @Post('*')
-  async sendRequest(@Req() req: Request, @Res() res: Response) {
-    const requestedApi = req.url.replace('/', '');
-    try {
-      const form = await this.formRegistryService.sendRequest({
-        requestedApi,
-        payload: req.body,
-      });
-      return form
-        ? res.status(HttpStatus.OK).send(form)
-        : res.sendStatus(HttpStatus.NOT_FOUND);
-    } catch {
-      return res.sendStatus(HttpStatus.INTERNAL_SERVER_ERROR);
-    }
+  @Post(':id')
+  @UseFilters(new InternalErrorFilter())
+  async sendRequest(@Param('id') id: string, @Body() body: any) {
+    return this.formRegistryService
+      .sendRequest({ id, payload: body })
+      .then((form) =>
+        form
+          ? form
+          : Promise.reject(
+              new HttpException('Form not found', HttpStatus.NOT_FOUND),
+            ),
+      );
   }
 }

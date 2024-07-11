@@ -1,4 +1,4 @@
-import { DynamicModule, Module, Type } from '@nestjs/common';
+import { DynamicModule, Global, Module, Type } from '@nestjs/common';
 import { readdirSync, statSync } from 'fs';
 import { join } from 'path';
 import { FORM_SERVICE_TOKEN } from './form.abstract.service';
@@ -8,62 +8,66 @@ interface ImplementationModule {
   providers: Type<any>[];
 }
 
+@Global()
 @Module({})
 export class FormDynamicModule {
   static async forRoot(): Promise<DynamicModule> {
-    const implementationModules = await this.loadImplementationModules(
-      join(__dirname, 'forms'),
-    );
+    const implementationModules =
+      await FormDynamicModule.loadImplementationModules(
+        join(__dirname, 'forms'),
+      );
 
-    const dynamicModule: DynamicModule = {
+    return {
       module: FormDynamicModule,
-      imports: implementationModules.map((m) => m.module),
+      imports: implementationModules.map(({ module }) => module),
       providers: [
-        ...implementationModules.flatMap((m) => m.providers),
+        ...implementationModules.flatMap(({ providers }) => providers),
         {
           provide: FORM_SERVICE_TOKEN,
           useFactory: (...implementations: any[]) => implementations,
-          inject: implementationModules.flatMap((m) => m.providers),
+          inject: implementationModules.flatMap(({ providers }) => providers),
         },
       ],
       exports: [FORM_SERVICE_TOKEN],
     };
-
-    return dynamicModule;
   }
 
-  private static async loadImplementationModules(
+  protected static async loadImplementationModules(
     dir: string,
   ): Promise<ImplementationModule[]> {
-    const modules: ImplementationModule[] = [];
-    const files = readdirSync(dir);
-
-    for (const file of files) {
-      const fullPath = join(dir, file);
-      if (statSync(fullPath).isDirectory()) {
-        const subModules = await this.loadImplementationModules(fullPath);
-        modules.push(...subModules);
-      } else if (file.endsWith('.module.js')) {
-        const module = await import(fullPath);
-        const exportedModule = Object.values(module).find(
-          (m) => typeof m === 'function' && m.name.endsWith('Module'),
-        ) as Type<any>;
-
-        if (!exportedModule) {
-          throw new Error(`No module found in ${file}`);
+    return Promise.all(
+      readdirSync(dir).map(async (file) => {
+        const fullPath = join(dir, file);
+        if (statSync(fullPath).isDirectory()) {
+          return this.loadImplementationModules(fullPath);
+        } else if (file.includes('.module.')) {
+          return this.loadModule(fullPath);
         }
+        return [];
+      }),
+    ).then((modules) => modules.flat());
+  }
 
-        const providers =
-          Reflect.getMetadata('providers', exportedModule) || [];
-        modules.push({
-          module: exportedModule,
-          providers: providers.map((p: any) =>
-            typeof p === 'function' ? p : p.provide,
-          ),
-        });
-      }
+  protected static async loadModule(
+    filePath: string,
+  ): Promise<ImplementationModule[]> {
+    const module = await import(filePath);
+    const exportedModule = Object.values(module).find(
+      (m) => typeof m === 'function' && m.name.endsWith('Module'),
+    ) as Type<any>;
+
+    if (!exportedModule) {
+      throw new Error(`No module found in ${filePath}`);
     }
 
-    return modules;
+    const providers = Reflect.getMetadata('providers', exportedModule) || [];
+    return [
+      {
+        module: exportedModule,
+        providers: providers.map((p: any) =>
+          typeof p === 'function' ? p : p.provide,
+        ),
+      },
+    ];
   }
 }

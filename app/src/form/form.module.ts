@@ -4,8 +4,8 @@ import { FormRegistryService } from './form-registry.service';
 import { FormController } from './form.controller';
 
 @Module({
+  imports: [FormDynamicModule],
   controllers: [FormController],
-  imports: [FormDynamicModule.forRoot()],
   providers: [FormRegistryService],
 })
 export class FormModule {}

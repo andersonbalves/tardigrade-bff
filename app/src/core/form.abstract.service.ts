@@ -1,6 +1,9 @@
 import * as fs from 'fs';
 import * as path from 'path';
+import { promisify } from 'util';
 import { FormModel } from './model/form.model';
+
+const readFileAsync = promisify(fs.readFile);
 
 export const FORM_SERVICE_TOKEN = Symbol('FormService');
 export abstract class FormService {
@@ -8,21 +11,35 @@ export abstract class FormService {
   protected abstract _label: string;
   protected abstract _menuPath: string[];
   protected abstract _url: string;
-  protected abstract _filePath: string;
+  protected abstract _payloadFile: string;
   protected abstract _dirname: string;
 
   abstract getForm(): Promise<FormModel>;
 
   async getAPI(): Promise<ApiModel> {
-    if (this._url === undefined || this._filePath === undefined)
-      throw new Error('FormService not initialized');
-    console.log(this._dirname, this._filePath);
-    return {
-      url: this._url,
-      payload: JSON.parse(
-        fs.readFileSync(path.join(this._dirname, this._filePath), 'utf8'),
-      ),
-    };
+    return this.validateInitialization()
+      .then(() => this.readPayloadFile())
+      .then((data) => this.parsePayload(data))
+      .then((payload) => ({ url: this._url, payload }));
+  }
+
+  private async validateInitialization(): Promise<void> {
+    return this._url && this._payloadFile
+      ? Promise.resolve()
+      : Promise.reject(new Error('FormService not initialized'));
+  }
+
+  private async readPayloadFile(): Promise<string> {
+    const payloadFilePath = path.join(this._dirname, this._payloadFile);
+    return readFileAsync(payloadFilePath, 'utf8');
+  }
+
+  private parsePayload(data: string): any {
+    try {
+      return JSON.parse(data);
+    } catch (error) {
+      return Promise.reject(new Error('Failed to parse payload file'));
+    }
   }
 
   get id(): string {

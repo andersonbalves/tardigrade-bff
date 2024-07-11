@@ -1,19 +1,28 @@
-import { Controller, Get, HttpStatus, Res } from '@nestjs/common';
-import { Response } from 'express';
+import {
+  Controller,
+  Get,
+  HttpException,
+  HttpStatus,
+  UseFilters,
+} from '@nestjs/common';
+import { InternalErrorFilter } from '../handlers/internal-error.filter';
 import { MenuService } from './menu.service';
 
 @Controller('v1/menu')
+@UseFilters(new InternalErrorFilter())
 export class MenuController {
-  constructor(private menuService: MenuService) {}
+  constructor(private readonly menuService: MenuService) {}
+
   @Get()
-  async getMenu(@Res() res: Response) {
+  async getMenu() {
     return this.menuService
       .createMenu()
       .then((menu) =>
         menu && menu.length > 0
-          ? res.status(HttpStatus.OK).json(menu)
-          : res.sendStatus(HttpStatus.NOT_FOUND),
-      )
-      .catch(() => res.sendStatus(HttpStatus.INTERNAL_SERVER_ERROR));
+          ? menu
+          : Promise.reject(
+              new HttpException('Menu not found', HttpStatus.NOT_FOUND),
+            ),
+      );
   }
 }

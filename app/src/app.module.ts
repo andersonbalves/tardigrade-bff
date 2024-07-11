@@ -1,10 +1,10 @@
 import { Module } from '@nestjs/common';
-import { EventEmitterModule } from '@nestjs/event-emitter';
+import { FormDynamicModule } from './core/form-dynamic.module';
 import { FormModule } from './form/form.module';
 import { MenuModule } from './menu/menu.module';
 
 @Module({
-  imports: [EventEmitterModule.forRoot(), FormModule, MenuModule],
+  imports: [FormDynamicModule.forRoot(), FormModule, MenuModule],
   controllers: [],
   providers: [],
 })

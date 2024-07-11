@@ -8,7 +8,7 @@ export class MenuService {
     @Inject(FORM_SERVICE_TOKEN) private readonly formServices: FormService[],
   ) {}
 
-  createMenu = async (): Promise<MenuModel[]> => {
+  createMenu(): Promise<MenuModel[]> {
     const addMenuItem = (
       path: string[],
       formService: FormService,
@@ -29,32 +29,32 @@ export class MenuService {
         (item) => item.label === currentPath,
       );
 
-      if (existingMenuItem) {
-        return menuItems.map((item) =>
-          item.label === currentPath
-            ? {
-                ...item,
-                action: Array.isArray(item.action)
-                  ? addMenuItem(remainingPath, formService, item.action)
-                  : [],
-              }
-            : item,
-        );
-      }
-
-      return [
-        ...menuItems,
-        {
-          label: currentPath,
-          action: addMenuItem(remainingPath, formService, []),
-        },
-      ];
+      return existingMenuItem
+        ? menuItems.map((item) =>
+            item.label === currentPath
+              ? {
+                  ...item,
+                  action: Array.isArray(item.action)
+                    ? addMenuItem(remainingPath, formService, item.action)
+                    : [],
+                }
+              : item,
+          )
+        : [
+            ...menuItems,
+            {
+              label: currentPath,
+              action: addMenuItem(remainingPath, formService, []),
+            },
+          ];
     };
 
-    return this.formServices.reduce(
+    const menu = this.formServices.reduce(
       (menuItems, formService) =>
         addMenuItem(formService.menuPath, formService, menuItems),
       [] as MenuModel[],
     );
-  };
+
+    return Promise.resolve(menu);
+  }
 }

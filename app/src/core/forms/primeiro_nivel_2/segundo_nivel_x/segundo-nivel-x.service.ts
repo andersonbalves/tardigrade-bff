@@ -6,11 +6,11 @@ import { form } from './form';
 
 @Injectable()
 export class SegundoNivelXFormService extends FormService {
-  protected _id = 'v1/form/primeiro_nivel_2/segundo_nivel_x';
+  protected _id = 'SegundoNivelXFormService';
   protected _label = 'Segundo Nível - X';
   protected _menuPath = ['Primeiro Nível - 2'];
   protected _url = 'https://api.example.com/data';
-  protected _filePath = 'payload.json';
+  protected _payloadFile = 'payload.json';
   protected _dirname = __dirname;
 
   async getForm(): Promise<FormModel> {

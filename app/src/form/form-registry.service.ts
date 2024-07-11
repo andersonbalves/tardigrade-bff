@@ -9,25 +9,24 @@ export class FormRegistryService {
     @Inject(FORM_SERVICE_TOKEN) private readonly formServices: FormService[],
   ) {}
 
-  async getFields(requestedApi: string): Promise<FormModel | undefined> {
-    const service = this.formServices.find(
-      (service) => service.id === requestedApi,
+  async getFields(id: string): Promise<FormModel | undefined> {
+    return Promise.resolve(
+      this.formServices.find((service) => service.id === id)?.getForm(),
     );
-    return service ? service.getForm() : undefined;
   }
 
-  async sendRequest(data: {
-    requestedApi: string;
-    payload: any;
-  }): Promise<any> {
-    const service = this.formServices.find(
-      (service) => service.id === data.requestedApi,
-    );
-    const payload = mustache.render(
-      JSON.stringify((await service?.getAPI())?.payload),
-      data.payload,
-    );
-
-    return JSON.parse(payload);
+  async sendRequest(data: { id: string; payload: any }): Promise<any> {
+    return Promise.resolve(
+      this.formServices.find((service) => service.id === data.id),
+    )
+      .then((service) =>
+        service
+          ? service.getAPI()
+          : Promise.reject(new Error('Service not found')),
+      )
+      .then((api) =>
+        mustache.render(JSON.stringify(api?.payload), data.payload),
+      )
+      .then((renderedPayload) => JSON.parse(renderedPayload));
   }
 }
