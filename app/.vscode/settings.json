@@ -1,0 +1,7 @@
+{
+  "jest.jestCommandLine": "npm test --",
+  "jest.runMode": {
+    "type": "on-demand",
+    "coverage": true
+  }
+}

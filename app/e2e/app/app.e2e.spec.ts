@@ -1,26 +1,19 @@
-import { INestApplication } from '@nestjs/common';
-import { Test, TestingModule } from '@nestjs/testing';
+/**
+ * @jest-environment ./e2e/jest.environment.ts
+ */
 import request from 'supertest'; // Alterar para importação padrão
-import { AppModule } from '../src/app.module';
 
 describe('AppModule (integration)', () => {
-  let app: INestApplication;
-
   beforeAll(async () => {
-    const moduleFixture: TestingModule = await Test.createTestingModule({
-      imports: [AppModule],
-    }).compile();
-
-    app = moduleFixture.createNestApplication();
-    await app.init();
+    await global.__APP__.init();
   });
 
   afterAll(async () => {
-    await app.close();
+    await global.__APP__.close();
   });
 
-  it('/form (GET) should return a form', () => {
-    return request(app.getHttpServer())
+  it('/form (GET) should return a form', async () => {
+    return request(global.__APP__.getHttpServer())
       .get('/v1/form/TerceiroNivelUmFormService')
       .expect(200)
       .expect((res: request.Response) => {
@@ -44,8 +37,8 @@ describe('AppModule (integration)', () => {
       });
   });
 
-  it('/menu (GET) should return the menu', () => {
-    return request(app.getHttpServer())
+  it('/menu (GET) should return the menu', async () => {
+    return request(global.__APP__.getHttpServer())
       .get('/v1/menu')
       .expect(200)
       .expect((res: request.Response) => {
