@@ -32,7 +32,7 @@ export class FormDynamicModule {
     };
   }
 
-  protected static async loadImplementationModules(
+  private static async loadImplementationModules(
     dir: string,
   ): Promise<ImplementationModule[]> {
     return Promise.all(
@@ -40,7 +40,7 @@ export class FormDynamicModule {
         const fullPath = join(dir, file);
         if (statSync(fullPath).isDirectory()) {
           return this.loadImplementationModules(fullPath);
-        } else if (file.includes('.module.')) {
+        } else if (file.endsWith('.module.js') || file.endsWith('.module.ts')) {
           return this.loadModule(fullPath);
         }
         return [];
@@ -48,7 +48,7 @@ export class FormDynamicModule {
     ).then((modules) => modules.flat());
   }
 
-  protected static async loadModule(
+  private static async loadModule(
     filePath: string,
   ): Promise<ImplementationModule[]> {
     const module = await import(filePath);
