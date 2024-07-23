@@ -1,3 +1,6 @@
+/**
+ * @jest-environment ./jest.environment.ts
+ */
 import * as fs from 'fs';
 import * as path from 'path';
 import { FormService } from './form.abstract.service';

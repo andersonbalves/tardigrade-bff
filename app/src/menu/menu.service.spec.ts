@@ -1,3 +1,6 @@
+/**
+ * @jest-environment ./jest.environment.ts
+ */
 import { Test, TestingModule } from '@nestjs/testing';
 import { FORM_SERVICE_TOKEN, FormService } from '../core/form.abstract.service';
 import { MenuModel } from '../core/model/menu.model';

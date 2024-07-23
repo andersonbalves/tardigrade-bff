@@ -1,5 +1,5 @@
 /**
- * @jest-environment ./e2e/jest.environment.ts
+ * @jest-environment ./jest.environment.ts
  */
 import * as fs from 'fs/promises';
 import * as mustache from 'mustache';

@@ -1,3 +1,6 @@
+/**
+ * @jest-environment ./jest.environment.ts
+ */
 import { DynamicModule } from '@nestjs/common';
 import * as fs from 'fs';
 import { FormDynamicModule } from './form-dynamic.module';

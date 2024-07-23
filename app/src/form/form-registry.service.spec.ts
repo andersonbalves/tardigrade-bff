@@ -1,3 +1,6 @@
+/**
+ * @jest-environment ./jest.environment.ts
+ */
 import { Test, TestingModule } from '@nestjs/testing';
 import * as mustache from 'mustache';
 import { FORM_SERVICE_TOKEN, FormService } from '../core/form.abstract.service';
@@ -29,7 +32,6 @@ jest.mock('mustache');
 
 describe('FormRegistryService', () => {
   let service: FormRegistryService;
-  let mockFormService: MockFormService;
 
   beforeEach(async () => {
     const mockFormServiceInstance = new MockFormService();

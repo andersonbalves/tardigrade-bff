@@ -1,3 +1,6 @@
+/**
+ * @jest-environment ./jest.environment.ts
+ */
 import { HttpException, HttpStatus } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { FormRegistryService } from './form-registry.service';

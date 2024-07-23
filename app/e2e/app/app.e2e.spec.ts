@@ -1,7 +1,7 @@
 /**
- * @jest-environment ./e2e/jest.environment.ts
+ * @jest-environment ./jest.environment.ts
  */
-import request from 'supertest'; // Alterar para importação padrão
+import request from 'supertest';
 
 describe('AppModule (integration)', () => {
   beforeAll(async () => {

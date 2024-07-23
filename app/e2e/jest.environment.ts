@@ -6,9 +6,10 @@ import {
 } from '../src/core/form.abstract.service';
 
 import { EnvironmentContext } from '@jest/environment';
+import { mixinJestEnvironment } from '@stryker-mutator/jest-runner';
 import { TestEnvironment } from 'jest-environment-node';
 
-class E2eEnvironment extends TestEnvironment {
+class JestE2eEnvironment extends TestEnvironment {
   constructor(config: any, _context: EnvironmentContext) {
     super(config, _context);
   }
@@ -33,4 +34,4 @@ class E2eEnvironment extends TestEnvironment {
   }
 }
 
-module.exports = E2eEnvironment;
+module.exports = mixinJestEnvironment(JestE2eEnvironment);

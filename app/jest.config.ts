@@ -3,13 +3,24 @@ import type { Config } from '@jest/types';
 const config: Config.InitialOptions = {
   moduleFileExtensions: ['ts', 'js', 'json'],
   rootDir: '.',
-  testRegex: '.*\\.spec\\.ts$',
+  testMatch: ['<rootDir>/src/**/*.spec.ts'],
+  collectCoverageFrom: ['<rootDir>/src/**/*.ts'],
+  coverageDirectory: './coverage',
   transform: {
     '^.+\\.(t|j)s$': 'ts-jest',
   },
-  collectCoverageFrom: ['**/*.(t|j)s'],
-  coverageDirectory: './coverage',
-  testEnvironment: 'node',
+  testPathIgnorePatterns: [
+    '/node_modules/',
+    '/dist/',
+    '/stryker-tmp/',
+    '/e2e/',
+  ],
+  coveragePathIgnorePatterns: [
+    '/node_modules/',
+    '/dist/',
+    '/stryker-tmp/',
+    '/e2e/',
+  ],
 };
 
 export default config;

@@ -24,6 +24,6 @@
     },
     "types": ["node", "jest"]
   },
-  "include": ["src/**/*.ts", "src/**/*.json", "e2e/**/*.ts"],
+  "include": ["src/**/*.ts", "src/**/*.json", "e2e/**/*.ts", "test/**/*.ts"],
   "exclude": ["node_modules"]
 }

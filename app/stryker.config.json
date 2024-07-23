@@ -1,0 +1,26 @@
+{
+  "$schema": "./node_modules/@stryker-mutator/core/schema/stryker-schema.json",
+  "packageManager": "npm",
+  "reporters": ["html", "clear-text", "progress", "dashboard"],
+  "testRunner": "jest",
+  "coverageAnalysis": "perTest",
+  "cleanTempDir": true,
+  "jest": {
+    "enableFindRelatedTests": false,
+    "configFile": "jest.config.ts",
+    "projectType": "custom",
+    "config": {
+      "testPathIgnorePatterns": [
+        "/node_modules/",
+        "/dist/",
+        ".*\\.e2e\\.spec\\.ts$"
+      ],
+      "coveragePathIgnorePatterns": [
+        "/node_modules/",
+        "/dist/",
+        ".*\\.e2e\\.spec\\.ts$"
+      ]
+    }
+  },
+  "tempDirName": "stryker-tmp"
+}

@@ -131,3 +131,5 @@ out
 /angular.code-workspace
 **/diff.txt
 /GitExtensions.settings
+/app/reports/mutation/mutation.html
+**/stryker-tmp/sandbox568314/**/*
