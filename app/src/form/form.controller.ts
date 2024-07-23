@@ -8,6 +8,8 @@ import {
   Post,
   UseFilters,
 } from '@nestjs/common';
+import { ApiOkResponse } from '@nestjs/swagger';
+import { FormModel } from '../core/model/form.model';
 import { InternalErrorFilter } from '../handlers/internal-error.filter';
 import { FormRegistryService } from './form-registry.service';
 
@@ -16,8 +18,11 @@ import { FormRegistryService } from './form-registry.service';
 export class FormController {
   constructor(private formRegistryService: FormRegistryService) {}
 
+  @ApiOkResponse({
+    type: FormModel,
+  })
   @Get(':id')
-  async findAPIFields(@Param('id') id: string) {
+  async findAPIFields(@Param('id') id: string): Promise<FormModel> {
     return this.formRegistryService
       .getFields(id)
       .then((form) =>

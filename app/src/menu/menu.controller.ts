@@ -5,6 +5,8 @@ import {
   HttpStatus,
   UseFilters,
 } from '@nestjs/common';
+import { ApiOkResponse } from '@nestjs/swagger';
+import { MenuModel } from '../core/model/menu.model';
 import { InternalErrorFilter } from '../handlers/internal-error.filter';
 import { MenuService } from './menu.service';
 
@@ -14,7 +16,10 @@ export class MenuController {
   constructor(private readonly menuService: MenuService) {}
 
   @Get()
-  async getMenu() {
+  @ApiOkResponse({
+    type: [MenuModel],
+  })
+  async getMenu(): Promise<MenuModel[]> {
     return this.menuService
       .createMenu()
       .then((menu) =>

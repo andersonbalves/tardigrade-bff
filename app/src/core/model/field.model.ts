@@ -1,7 +1,13 @@
-export interface FieldModel {
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+
+export class FieldModel {
+  @ApiProperty()
   name: string;
+  @ApiProperty()
   label: string;
+  @ApiProperty()
   required: boolean;
+  @ApiProperty()
   type:
     | 'color'
     | 'date'
@@ -16,8 +22,12 @@ export interface FieldModel {
     | 'time'
     | 'url'
     | 'week';
+  @ApiPropertyOptional()
   default?: any;
+  @ApiPropertyOptional()
   description?: string;
+  @ApiPropertyOptional()
   minLength?: number;
+  @ApiPropertyOptional()
   maxLength?: number;
 }
