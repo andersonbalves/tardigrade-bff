@@ -22,7 +22,8 @@
     "test:cov": "jest ./src --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest -c ./e2e/jest.config.ts",
-    "test:all": "npm run test && npm run test:e2e"
+    "test:all": "npm run test && npm run test:e2e",
+    "stryker": "stryker run"
   },
   "dependencies": {
     "@nestjs/common": "^10.0.0",
